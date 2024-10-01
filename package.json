@@ -4,7 +4,7 @@
   "description": "building a simple password manager ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/tdrmk/password-manager/issues"
   },
-  "homepage": "https://github.com/tdrmk/password-manager#readme"
+  "homepage": "https://github.com/tdrmk/password-manager#readme",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
 }
