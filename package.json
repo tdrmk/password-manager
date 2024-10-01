@@ -1,0 +1,19 @@
+{
+  "name": "password-manager",
+  "version": "1.0.0",
+  "description": "building a simple password manager ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tdrmk/password-manager.git"
+  },
+  "author": "tdrk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tdrmk/password-manager/issues"
+  },
+  "homepage": "https://github.com/tdrmk/password-manager#readme"
+}
