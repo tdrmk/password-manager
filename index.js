@@ -8,7 +8,7 @@ import {
   updatePasswordForUser,
   createPasswordForUser,
   close,
-} from "./db-utils.js";
+} from "./db-utils.lowdb.js";
 import {
   hashPassword,
   matchesPassword,
