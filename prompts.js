@@ -174,7 +174,7 @@ export async function updatePasswordPrompt({
     (await inquirer.password({
       message: "Enter the password:",
       mask: "*",
-    })) ?? password;
+    })) || password;
   const newNotes = await inquirer.input({
     message: "Enter any notes (optional):",
     default: notes,

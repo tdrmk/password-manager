@@ -7,6 +7,7 @@ import {
   deletePasswordForUser,
   updatePasswordForUser,
   createPasswordForUser,
+  close,
 } from "./db-utils.js";
 import {
   hashPassword,
@@ -49,18 +50,13 @@ async function managePasswords(userId, masterKey) {
         continue;
       }
 
-      const {
-        website,
-        encryptedUsername,
-        encryptedPassword,
-        notes,
-        id: passwordId,
-      } = password;
-      console.log(chalk.green("Website: "), website);
-      console.log(password);
+      const { _id: passwordId } = password;
+      console.log(chalk.green("Website: "), password.website);
       while (true) {
         const password = await getPasswordForUser(userId, passwordId);
         const choice = await managePasswordPrompt(password);
+        const { website, encryptedUsername, encryptedPassword, notes } =
+          password;
         if (choice === "view-username") {
           const username = decrypt(encryptedUsername, masterKey);
           await clipboard.write(decrypt(encryptedUsername, masterKey));
@@ -79,7 +75,7 @@ async function managePasswords(userId, masterKey) {
             password: decrypt(encryptedPassword, masterKey),
             notes,
           });
-          await updatePasswordForUser(userId, password.id, {
+          await updatePasswordForUser(userId, password._id, {
             website: updatedFields.website,
             encryptedUsername: encrypt(updatedFields.username, masterKey),
             encryptedPassword: encrypt(updatedFields.password, masterKey),
@@ -126,9 +122,10 @@ async function main() {
 
       console.log(chalk.green(`Logged in! Welcome ${user.username}`));
       const masterKey = deriveKey(password);
-      await managePasswords(user.id, masterKey);
+      await managePasswords(user._id, masterKey);
     } else if (choice === "exit") {
       console.log(chalk.green("Goodbye!"));
+      await close();
       break;
     }
   }

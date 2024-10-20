@@ -9,7 +9,7 @@ await db.write();
 
 export async function createUser(username, hashedMasterPassword) {
   const user = {
-    id: uuid(),
+    _id: uuid(),
     username,
     hashedMasterPassword,
     passwords: [],
@@ -17,6 +17,7 @@ export async function createUser(username, hashedMasterPassword) {
 
   db.data.users.push(user);
   await db.write();
+  return user._id;
 }
 
 export async function getUserByUsername(username) {
@@ -26,7 +27,7 @@ export async function getUserByUsername(username) {
 
 export async function getUserById(userId) {
   await db.read();
-  return db.data.users.find((user) => user.id === userId);
+  return db.data.users.find((user) => user._id === userId);
 }
 
 export async function createPasswordForUser(
@@ -35,7 +36,7 @@ export async function createPasswordForUser(
 ) {
   const user = await getUserById(userId);
   const password = {
-    id: uuid(),
+    _id: uuid(),
     website,
     encryptedUsername,
     encryptedPassword,
@@ -54,13 +55,13 @@ export async function getPasswordsForUser(userId) {
 
 export async function getPasswordForUser(userId, passwordId) {
   const user = await getUserById(userId);
-  return user.passwords.find((password) => password.id === passwordId);
+  return user.passwords.find((password) => password._id === passwordId);
 }
 
 export async function deletePasswordForUser(userId, passwordId) {
   const user = await getUserById(userId);
   user.passwords = user.passwords.filter(
-    (password) => password.id !== passwordId
+    (password) => password._id !== passwordId
   );
   await db.write();
 }
@@ -68,17 +69,21 @@ export async function deletePasswordForUser(userId, passwordId) {
 export async function updatePasswordForUser(
   userId,
   passwordId,
-  { website, encrypedUsername, encryptedPassword, notes }
+  { website, encryptedUsername, encryptedPassword, notes }
 ) {
   const user = await getUserById(userId);
   const password = user.passwords.find(
-    (password) => password.id === passwordId
+    (password) => password._id === passwordId
   );
 
   password.website = website;
-  password.encrypedUsername = encrypedUsername;
+  password.encryptedUsername = encryptedUsername;
   password.encryptedPassword = encryptedPassword;
   password.notes = notes;
 
+  await db.write();
+}
+
+export async function close() {
   await db.write();
 }
