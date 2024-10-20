@@ -112,7 +112,7 @@ export async function managePasswordPrompt({ website, notes }) {
           "Update the website, username, password, or notes for this password",
       },
       {
-        name: "Delete Password",
+        name: chalk.red("Delete Password"),
         value: "delete",
         description: "Delete this password details from your account",
       },
