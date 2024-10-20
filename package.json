@@ -1,0 +1,45 @@
+{
+  "name": "password-manager",
+  "version": "1.0.0",
+  "description": "a simple password manager app",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon -r dotenv/config index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tdrmk/password-manager.git"
+  },
+  "keywords": [
+    "password-manager"
+  ],
+  "author": "tdhrmkr@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tdrmk/password-manager/issues"
+  },
+  "homepage": "https://github.com/tdrmk/password-manager#readme",
+  "engines": {
+    "node": "^20.11.1",
+    "npm": "^10.2.4"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.1.7"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.0.0",
+    "bcrypt": "^5.1.1",
+    "chalk": "^5.3.0",
+    "clipboardy": "^4.0.0",
+    "lowdb": "^7.0.1",
+    "uuid": "^10.0.0"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "db.json"
+    ]
+  }
+}
