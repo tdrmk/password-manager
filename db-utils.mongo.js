@@ -12,6 +12,7 @@ export async function createUser(username, hashedMasterPassword) {
     username,
     hashedMasterPassword,
     passwords: [],
+    createdAt: new Date(),
   });
   return insertResult.insertedId;
 }
@@ -36,6 +37,7 @@ export async function createPasswordForUser(
     encryptedUsername,
     encryptedPassword,
     notes,
+    createdAt: new Date(),
   };
   // https://www.mongodb.com/docs/manual/reference/operator/update/push/#append-a-value-to-an-array
   await collection.updateOne(
@@ -87,6 +89,7 @@ export async function updatePasswordForUser(
         "passwords.$.encryptedUsername": encryptedUsername,
         "passwords.$.encryptedPassword": encryptedPassword,
         "passwords.$.notes": notes,
+        "passwords.$.updatedAt": new Date(),
       },
     }
   );

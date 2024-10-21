@@ -13,6 +13,7 @@ export async function createUser(username, hashedMasterPassword) {
     username,
     hashedMasterPassword,
     passwords: [],
+    createdAt: new Date(),
   };
 
   db.data.users.push(user);
@@ -41,6 +42,7 @@ export async function createPasswordForUser(
     encryptedUsername,
     encryptedPassword,
     notes,
+    createdAt: new Date(),
   };
 
   user.passwords.push(password);
@@ -80,6 +82,7 @@ export async function updatePasswordForUser(
   password.encryptedUsername = encryptedUsername;
   password.encryptedPassword = encryptedPassword;
   password.notes = notes;
+  password.updatedAt = new Date();
 
   await db.write();
 }
