@@ -87,11 +87,9 @@ export async function searchPasswordPrompt(passwords) {
   return password;
 }
 
-export async function managePasswordPrompt({ website, notes }) {
+export async function managePasswordPrompt({ website }) {
   const choice = await inquirer.select({
-    message: `What would you like to do with ${website} ${
-      notes ? `(${notes})` : ""
-    }?`,
+    message: "What would you like to do with " + chalk.green(website) + "?",
     choices: [
       {
         name: "View Username",
@@ -102,6 +100,12 @@ export async function managePasswordPrompt({ website, notes }) {
         name: "Copy Password",
         value: "copy-password",
         description: "Copy the password to the clipboard",
+      },
+      {
+        name: "View Details",
+        value: "view-details",
+        description:
+          "View the website, username, notes, and other details (except password)",
       },
       { name: "Exit", value: "exit", description: "Go back to the main menu" },
       new inquirer.Separator(),

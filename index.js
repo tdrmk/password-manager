@@ -51,7 +51,6 @@ async function managePasswords(userId, masterKey) {
       }
 
       const { _id: passwordId } = password;
-      console.log(chalk.green("Website: "), password.website);
       while (true) {
         const password = await getPasswordForUser(userId, passwordId);
         const choice = await managePasswordPrompt(password);
@@ -68,6 +67,17 @@ async function managePasswords(userId, masterKey) {
           const password = decrypt(encryptedPassword, masterKey);
           await clipboard.write(password);
           console.log(chalk.green("Password copied to clipboard!"));
+        } else if (choice === "view-details") {
+          const print = (label, value) =>
+            console.log(
+              chalk.green(label.padEnd(15)),
+              chalk.blue(value || "N/A")
+            );
+          print("Website:", website);
+          print("Username:", decrypt(encryptedUsername, masterKey));
+          print("Notes:", notes);
+          print("Created At:", password.createdAt?.toLocaleString());
+          print("Updated At:", password.updatedAt?.toLocaleString());
         } else if (choice === "update") {
           const updatedFields = await updatePasswordPrompt({
             website,
