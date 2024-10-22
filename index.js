@@ -1,14 +1,4 @@
-import {
-  createUser,
-  getUserByUsername,
-  getUserById,
-  getPasswordsForUser,
-  getPasswordForUser,
-  deletePasswordForUser,
-  updatePasswordForUser,
-  createPasswordForUser,
-  close,
-} from "./db-utils.lowdb.js";
+import { createDBUtils } from "./db-utils.js";
 import {
   hashPassword,
   matchesPassword,
@@ -28,14 +18,17 @@ import {
 } from "./prompts.js";
 import chalk from "chalk";
 import clipboard from "clipboardy";
+
+const dbUtils = await createDBUtils(process.env.DB_TYPE);
+
 async function managePasswords(userId, masterKey) {
   while (true) {
-    const passwords = await getPasswordsForUser(userId);
+    const passwords = await dbUtils.getPasswordsForUser(userId);
     const hasPasswords = passwords.length > 0;
     const choice = await managePasswordsPrompt(hasPasswords);
     if (choice === "add") {
       const { website, username, password, notes } = await addPasswordPrompt();
-      await createPasswordForUser(userId, {
+      await dbUtils.createPasswordForUser(userId, {
         website,
         encryptedUsername: encrypt(username, masterKey),
         encryptedPassword: encrypt(password, masterKey),
@@ -43,7 +36,7 @@ async function managePasswords(userId, masterKey) {
       });
       console.log(chalk.green("Password added!"));
     } else if (choice === "search") {
-      const passwords = await getPasswordsForUser(userId);
+      const passwords = await dbUtils.getPasswordsForUser(userId);
       const password = await searchPasswordPrompt(passwords);
       if (!password) {
         console.log(chalk.red("Password not found"));
@@ -52,7 +45,7 @@ async function managePasswords(userId, masterKey) {
 
       const { _id: passwordId } = password;
       while (true) {
-        const password = await getPasswordForUser(userId, passwordId);
+        const password = await dbUtils.getPasswordForUser(userId, passwordId);
         const choice = await managePasswordPrompt(password);
         const { website, encryptedUsername, encryptedPassword, notes } =
           password;
@@ -85,7 +78,7 @@ async function managePasswords(userId, masterKey) {
             password: decrypt(encryptedPassword, masterKey),
             notes,
           });
-          await updatePasswordForUser(userId, password._id, {
+          await dbUtils.updatePasswordForUser(userId, password._id, {
             website: updatedFields.website,
             encryptedUsername: encrypt(updatedFields.username, masterKey),
             encryptedPassword: encrypt(updatedFields.password, masterKey),
@@ -93,7 +86,7 @@ async function managePasswords(userId, masterKey) {
           });
           console.log(chalk.green("Password updated!"));
         } else if (choice === "delete") {
-          await deletePasswordForUser(userId, passwordId);
+          await dbUtils.deletePasswordForUser(userId, passwordId);
           console.log(chalk.green("Password deleted!"));
           break;
         } else if (choice === "exit") {
@@ -112,18 +105,18 @@ async function main() {
 
     if (choice === "register") {
       const { username, password } = await registerUserPrompt();
-      const existinUser = await getUserByUsername(username);
+      const existinUser = await dbUtils.getUserByUsername(username);
       if (existinUser) {
         console.log(chalk.red("User already exists"));
         continue;
       }
 
       const hashedMasterPassword = hashPassword(password);
-      await createUser(username, hashedMasterPassword);
+      await dbUtils.createUser(username, hashedMasterPassword);
       console.log(chalk.green("User created! You can now login"));
     } else if (choice === "login") {
       const { username, password } = await loginUserPrompt();
-      const user = await getUserByUsername(username);
+      const user = await dbUtils.getUserByUsername(username);
 
       if (!user || !matchesPassword(password, user.hashedMasterPassword)) {
         console.log(chalk.red("Invalid username or password"));
@@ -135,7 +128,7 @@ async function main() {
       await managePasswords(user._id, masterKey);
     } else if (choice === "exit") {
       console.log(chalk.green("Goodbye!"));
-      await close();
+      await dbUtils.close();
       break;
     }
   }

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon -r dotenv/config index.js",
-    "start": "node index.js"
+    "start": "node -r dotenv/config index.js"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
     "bcrypt": "^5.1.1",
     "chalk": "^5.3.0",
     "clipboardy": "^4.0.0",
+    "dropbox": "^10.34.0",
     "lowdb": "^7.0.1",
     "mongodb": "^6.9.0",
     "uuid": "^10.0.0"
