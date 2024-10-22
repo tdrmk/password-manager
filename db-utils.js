@@ -23,6 +23,9 @@ export async function createDBUtils(type) {
       users: [],
     });
 
+    // Read the file if it exists, else default to the initial data
+    await db.read();
+    // If the file doesn't exist, create it with the initial data
     await db.write();
     const dbUtils = new LowDBUtils(db);
     return dbUtils;
@@ -36,7 +39,14 @@ export async function createDBUtils(type) {
     const db = new Low(adapter, {
       users: [],
     });
-    await db.write();
+    try {
+      await db.read();
+      console.log(`Using an existing file at ${filePath} in Dropbox`);
+    } catch (error) {
+      // If the file doesn't exist, create it
+      await db.write();
+      console.log(`Created a new file at ${filePath} in Dropbox`);
+    }
     const dbUtils = new LowDBUtils(db);
     return dbUtils;
   }
