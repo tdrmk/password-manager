@@ -14,6 +14,18 @@ export async function registerUserPrompt() {
     validate: validatePassword,
   });
 
+  // user must confirm their password to prevent typos
+  const confirmPassword = await inquirer.password({
+    message: "Confirm your password:",
+    mask: "*",
+    validate: (confirmPassword) => {
+      if (confirmPassword !== password) {
+        return "Passwords do not match";
+      }
+      return true;
+    },
+  });
+
   return { username, password };
 }
 

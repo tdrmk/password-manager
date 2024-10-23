@@ -39,7 +39,7 @@ export function validatePassword(password) {
   }
 
   if (!/^[a-zA-Z0-9!@#$%^&*()-_+=]+$/.test(password)) {
-    return "Password can only contain letters , numbers, and special characters among !@#$%^&*()-_+=";
+    return "Password can only contain letters, numbers, and special characters among !@#$%^&*()-_+=";
   }
   return true;
 }
