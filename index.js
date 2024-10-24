@@ -15,6 +15,7 @@ import {
   searchPasswordPrompt,
   managePasswordPrompt,
   updatePasswordPrompt,
+  changeMasterPasswordPrompt,
 } from "./prompts.js";
 import chalk from "chalk";
 import clipboard from "clipboardy";
@@ -66,11 +67,15 @@ async function managePasswords(userId, masterKey) {
               chalk.green(label.padEnd(15)),
               chalk.blue(value || "N/A")
             );
+
+          const getDate = (date) =>
+            date ? new Date(date).toLocaleString() : null;
+
           print("Website:", website);
           print("Username:", decrypt(encryptedUsername, masterKey));
           print("Notes:", notes);
-          print("Created At:", password.createdAt?.toLocaleString());
-          print("Updated At:", password.updatedAt?.toLocaleString());
+          print("Created At:", getDate(password.createdAt));
+          print("Updated At:", getDate(password.updatedAt));
         } else if (choice === "update") {
           const updatedFields = await updatePasswordPrompt({
             website,
@@ -93,6 +98,51 @@ async function managePasswords(userId, masterKey) {
           break;
         }
       }
+    } else if (choice === "delete-account") {
+      // Prompt makes sure the user wants to delete the account (via reconfirmation)
+      await dbUtils.deleteUser(userId);
+      console.log(chalk.green("Account deleted!"));
+      break;
+    } else if (choice === "change-master-password") {
+      // Get the new master password from the user
+      // Create a new user with the new master password (and same username)
+      // Re-encrypt all the passwords with the new master password
+      // Delete the old user and all its passwords
+      // and log the user out
+      const newPassword = await changeMasterPasswordPrompt();
+
+      // Get the existing user and all their passwords
+      const user = await dbUtils.getUserById(userId);
+      const passwords = await dbUtils.getPasswordsForUser(userId);
+
+      // Create a new user with the new master password
+      const newUserId = await dbUtils.createUser(
+        user.username,
+        hashPassword(newPassword)
+      );
+      const newMasterKey = deriveKey(newPassword);
+
+      // Re-encrypt all the passwords with the new master password
+      for (const password of passwords) {
+        await dbUtils.createPasswordForUser(newUserId, {
+          website: password.website,
+          encryptedUsername: encrypt(
+            decrypt(password.encryptedUsername, masterKey),
+            newMasterKey
+          ),
+          encryptedPassword: encrypt(
+            decrypt(password.encryptedPassword, masterKey),
+            newMasterKey
+          ),
+          notes: password.notes,
+        });
+      }
+
+      // Delete the old user and all its passwords
+      await dbUtils.deleteUser(userId);
+      console.log(chalk.green("Master password changed!"));
+      console.log(chalk.blue("You have been logged out. Please login again."));
+      break;
     } else if (choice === "exit") {
       break;
     }

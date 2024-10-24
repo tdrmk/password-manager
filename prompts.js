@@ -73,8 +73,32 @@ export async function managePasswordsPrompt(hasPasswords = true) {
       },
       { name: "Add Password", value: "add", description: "Add a new password" },
       { name: "Logout", value: "exit", description: "Log out of your account" },
+      new inquirer.Separator(),
+      {
+        name: chalk.yellow("Change Password"),
+        value: "change-master-password",
+        description:
+          "Change your master password. This will also re-encrypt all your passwords with the new master password",
+      },
+      {
+        name: chalk.red("Delete Account"),
+        value: "delete-account",
+        description:
+          "Delete your account (only allowed if you have no passwords)",
+        disabled: hasPasswords,
+      },
     ],
   });
+
+  if (choice === "delete-account") {
+    // reconfirm the user's choice to delete their account
+    const confirm = await inquirer.confirm({
+      message: chalk.red("Are you sure you want to delete your account?"),
+      default: false,
+    });
+
+    if (!confirm) return "retry";
+  }
 
   return choice;
 }
@@ -202,4 +226,26 @@ export async function updatePasswordPrompt({
     password: newPassword,
     notes: newNotes,
   };
+}
+
+export async function changeMasterPasswordPrompt() {
+  const newPassword = await inquirer.password({
+    message: "Enter your new master password:",
+    mask: "*",
+    validate: validatePassword,
+  });
+
+  // user must confirm their password to prevent typos
+  const confirmPassword = await inquirer.password({
+    message: "Confirm your new password:",
+    mask: "*",
+    validate: (confirmPassword) => {
+      if (confirmPassword !== newPassword) {
+        return "Passwords do not match";
+      }
+      return true;
+    },
+  });
+
+  return newPassword;
 }
