@@ -87,6 +87,13 @@ export class LowDBUtils extends DBUtils {
     await this.db.write();
   }
 
+  async deleteUser(userId) {
+    this.db.data.users = this.db.data.users.filter(
+      (user) => user._id !== userId
+    );
+    await this.db.write();
+  }
+
   async close() {
     await this.db.write();
   }

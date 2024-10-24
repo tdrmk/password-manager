@@ -1,6 +1,7 @@
 import { DBUtils } from "./db-utils.abstract.js";
 import { MongoClient, ObjectId } from "mongodb";
 
+// Note: all id fields are ObjectId instances and not strings
 export class MongoDbUtils extends DBUtils {
   constructor(uri) {
     super();
@@ -99,6 +100,10 @@ export class MongoDbUtils extends DBUtils {
         },
       }
     );
+  }
+
+  async deleteUser(userId) {
+    await this.collection.deleteOne({ _id: userId });
   }
 
   async close() {

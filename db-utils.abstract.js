@@ -30,6 +30,9 @@ export class DBUtils {
   ) {
     throw new Error("Not implemented");
   }
+  async deleteUser(userId) {
+    throw new Error("Not implemented");
+  }
   async close() {
     throw new Error("Not implemented");
   }
